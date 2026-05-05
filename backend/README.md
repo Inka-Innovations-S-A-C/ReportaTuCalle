@@ -1,15 +1,15 @@
-# 🚀 Reporta Tu Calle API - Simple
+# Reporta Tu Calle API - Simple
 
 API REST simple en Spring Boot **sin base de datos**, datos en memoria. Para testear con Postman.
 
-## 📦 Requisitos
+## Requisitos
 
 ```
-Java 17+
+Java 25
 Maven 3.8+
 ```
 
-## ▶️ Ejecutar
+## Ejecutar
 
 ```bash
 cd backend
@@ -18,7 +18,7 @@ mvn spring-boot:run
 
 Servidor estará en: `http://localhost:8080/api/v1`
 
-## 🔌 Endpoints
+## Endpoints
 
 ### Usuarios
 
@@ -88,7 +88,7 @@ GET /api/v1/categorias
 GET /api/v1/categorias/1
 ```
 
-## 📝 Categorías por Defecto
+##  Categorías por Defecto
 
 ```
 1 - Baches
@@ -101,18 +101,18 @@ GET /api/v1/categorias/1
 8 - Otro
 ```
 
-## 💾 Datos
+## Datos
 
 Los datos se guardan **EN MEMORIA** mientras el servidor está activo. Al reiniciar se limpian.
 
-## 🎯 Próximos Pasos
+## Próximos Pasos
 
-- [ ] Agregar JWT para autenticación
-- [ ] Conectar con MongoDB
-- [ ] Agregar validaciones más robustas
-- [ ] Agregar error handling global
+- Agregar JWT para autenticación
+- Conectar con MongoDB
+- Agregar validaciones más robustas
+- Agregar error handling global
 
 ---
 
 **Versión:** 1.0  
-**Estado:** API Simple & Funcional ✅
+**Estado:** API Simple & Funcional 

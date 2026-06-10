@@ -1,0 +1,48 @@
+services:
+  # 1. BASE DE DATOS PRINCIPAL (PostgreSQL + PostGIS)
+  postgres-main:
+    image: postgis/postgis:16-3.4
+    container_name: rtc-postgres-main
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password
+      POSTGRES_DB: reporta_tu_calle
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_main_data:/var/lib/postgresql/data
+
+  # 2. BASE DE DATOS PARA SONARQUBE (Interna) 
+  postgres-sonar:
+    image: postgres:15
+    container_name: rtc-postgres-sonar
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar_password
+      POSTGRES_DB: sonarqube
+    volumes:
+      - postgres_sonar_data:/var/lib/postgresql/data
+
+  # 3. SERVIDOR DE SONARQUBE (Conectado a su base de datos)
+  sonarqube:
+    image: sonarqube:latest
+    container_name: rtc-sonarqube
+    depends_on:
+      - postgres-sonar
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres-sonar:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar_password
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+
+volumes:
+  postgres_main_data:
+  postgres_sonar_data:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:

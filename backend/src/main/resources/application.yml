@@ -1,21 +1,21 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/spring-projects/sts4/main/ide/org.springframework.ide.vscode.boot.app.core/resources/application.yml
 spring:
   application:
     name: reporta-tu-calle-api
   
-  # --- LA SOLUCIÓN AL ERROR DE FLYWAY ---
+  # --- SOLUCIÓN AL ERROR DE FLYWAY ---
   flyway:
     baseline-on-migrate: true
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/reportatucalle
-    username: admin
-    password: admin_password
+    url: jdbc:postgresql://localhost:5432/reporta_tu_calle
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:admin_password}
     driver-class-name: org.postgresql.Driver
   
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+    #para produccion seria false
     show-sql: true
     properties:
       hibernate:
@@ -35,8 +35,8 @@ storage:
   provider: local
 
 app:
-  base-url: http://localhost:8080/api/v1
+  base-url: ${APP_BASE_URL:http://localhost:8080}
   security:
     jwt:
-      secret: "estaEsUnaClaveSecretaMuyLargaParaPoderFirmarLosTokensDeNuestraApp"
+      secret: ${JWT_SECRET:estaEsUnaClaveSecretaMuyLargaParaPoderFirmarLosTokensDeNuestraApp}
       expiration: 86400000

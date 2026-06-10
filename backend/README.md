@@ -5,7 +5,7 @@ API REST simple en Spring Boot **sin base de datos**, datos en memoria. Para tes
 ## Requisitos
 
 ```
-Java 25
+Java 21
 Maven 3.8+
 ```
 
@@ -24,7 +24,7 @@ Servidor estará en: `http://localhost:8080/api/v1`
 
 ```bash
 # Registrar ciudadano (sin teléfono)
-POST /api/v1/usuarios
+POST /api/v1/auth
 {
   "email": "juan@test.com",
   "password": "Password123!",
@@ -33,21 +33,15 @@ POST /api/v1/usuarios
 }
 
 # Registrar supervisor (con teléfono obligatorio)
-POST /api/v1/usuarios
+POST /api/v1/auth
 {
   "email": "supervisor@test.com",
   "password": "Password123!",
   "nombre": "García López",
-  "tipo": "supervisor",
+  "tipo": "Supervisor",
   "telefono": "+573001234567"
 }
 
-# Obtener usuario
-GET /api/v1/usuarios/1
-
-# Listar todos
-GET /api/v1/usuarios
-```
 
 ### Reportes
 
@@ -88,8 +82,8 @@ GET /api/v1/categorias
 GET /api/v1/categorias/1
 ```
 
-##  Categorías por Defecto
-
+##  Categorías por Defecto en sprint 2
+##  (Realmente el ADMIN es el que las crea)
 ```
 1 - Baches
 2 - Fuga de agua
@@ -103,16 +97,14 @@ GET /api/v1/categorias/1
 
 ## Datos
 
-Los datos se guardan **EN MEMORIA** mientras el servidor está activo. Al reiniciar se limpian.
+Los datos se guardan en una base de datos Postgres Local
 
 ## Próximos Pasos
 
-- Agregar JWT para autenticación
-- Conectar con MongoDB
-- Agregar validaciones más robustas
-- Agregar error handling global
-
+- Mejorar aún más el frontend
+- Buscar datasets reales para el análisis con el supervisor
+- Subir la base de datos a la nube
 ---
 
-**Versión:** 1.0  
-**Estado:** API Simple & Funcional 
+**Versión:** 2.0 
+**Estado:** Monolito modular con backend y frontend

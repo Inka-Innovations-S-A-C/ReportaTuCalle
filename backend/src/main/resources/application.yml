@@ -4,7 +4,9 @@ spring:
   
   # --- SOLUCIÓN AL ERROR DE FLYWAY ---
   flyway:
+    enabled: true
     baseline-on-migrate: true
+    validate-on-migrate: false
   
   datasource:
     url: jdbc:postgresql://localhost:5432/reporta_tu_calle
@@ -32,7 +34,7 @@ logging:
     com.reportatucalle: DEBUG
 
 storage:
-  provider: local
+  provider: cloudinary
 
 app:
   base-url: ${APP_BASE_URL:http://localhost:8080}
@@ -40,3 +42,6 @@ app:
     jwt:
       secret: ${JWT_SECRET:estaEsUnaClaveSecretaMuyLargaParaPoderFirmarLosTokensDeNuestraApp}
       expiration: 86400000
+
+cloudinary:
+  url: ${CLOUDINARY_URL:cloudinary://746524262791134:ewDm6PGZV3x-zZ1pKm7mEcVGRV0@dl96lz854}

@@ -2,6 +2,7 @@ package com.reportatucalle.modules.user.domain.repository;
 
 import com.reportatucalle.modules.user.domain.entity.UserProfile;
 import java.util.Optional;
+import java.util.List;
 
 /**
  * Puerto de salida (Outbound Port): Contrato de persistencia para perfiles de usuario.
@@ -38,4 +39,14 @@ public interface UserProfileRepository {
      * Verifica si existe un perfil vinculado a esa cuenta.
      */
     boolean existsByAccountId(Long accountId);
+    
+    /**
+     * Obtiene todos los perfiles de usuario.
+     */
+    List<UserProfile> findAll();
+    
+    /**
+     * Obtiene el ranking de ciudadanos por puntaje.
+     */
+    List<UserProfile> findTopCitizens(int limit);
 }

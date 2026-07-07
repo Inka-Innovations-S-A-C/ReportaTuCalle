@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  * ✅ Desacoplada del módulo Auth a nivel de código Java
  */
 @Entity
-@Table(name = "user_profiles")
+@Table(name = "user_profiles", schema = "\"user\"")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,6 +39,10 @@ public class UserProfileJpaEntity {
     
     @Column(length = 20)
     private String phone;
+    
+    @Column(name = "civic_score", nullable = false)
+    @Builder.Default
+    private Integer civicScore = 0;
     
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

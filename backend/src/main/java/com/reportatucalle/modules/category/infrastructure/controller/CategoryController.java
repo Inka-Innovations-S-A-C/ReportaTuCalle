@@ -10,9 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.reportatucalle.modules.category.application.dto.UpdateCategoryRequest;
 
 import java.util.List;
 
@@ -84,11 +88,38 @@ public class CategoryController {
      * @return la categoría creada
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
             @RequestBody CreateCategoryRequest request) {
         CategoryResponse createdCategory = categoryService.createCategory(request);
         
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(createdCategory, "Categoría creada exitosamente"));
+    }
+
+    /**
+     * PUT /api/v1/categories/{id}
+     * 
+     * Endpoint para actualizar una categoría.
+     */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
+            @PathVariable Long id,
+            @RequestBody UpdateCategoryRequest request) {
+        CategoryResponse updatedCategory = categoryService.updateCategory(id, request);
+        return ResponseEntity.ok(ApiResponse.success(updatedCategory, "Categoría actualizada exitosamente"));
+    }
+
+    /**
+     * DELETE /api/v1/categories/{id}
+     * 
+     * Endpoint para eliminar una categoría.
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "Categoría eliminada exitosamente"));
     }
 }

@@ -1,6 +1,7 @@
 package com.reportatucalle.modules.auth.domain.repository;
 
 import com.reportatucalle.modules.auth.domain.entity.AuthAccount;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -38,4 +39,9 @@ public interface AuthAccountRepository {
      * Verifica si existe una cuenta con ese ID.
      */
     boolean existsById(Long id);
+    
+    /**
+     * Obtiene todas las cuentas.
+     */
+    List<AuthAccount> findAll();
 }

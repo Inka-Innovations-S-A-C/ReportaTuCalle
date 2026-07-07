@@ -7,6 +7,9 @@ import com.reportatucalle.modules.report.infrastructure.persistence.repository.R
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 public class ReportEndorsementPersistenceAdapter implements ReportEndorsementRepository {
@@ -31,5 +34,17 @@ public class ReportEndorsementPersistenceAdapter implements ReportEndorsementRep
     @Override
     public boolean existsByReportIdAndCitizenId(Long reportId, Long citizenId) {
         return jpaRepository.existsByReportIdAndCitizenId(reportId, citizenId);
+    }
+
+    @Override
+    public List<ReportEndorsement> findByReportId(Long reportId) {
+        return jpaRepository.findByReportId(reportId).stream()
+                .map(saved -> ReportEndorsement.builder()
+                        .id(saved.getId())
+                        .reportId(saved.getReportId())
+                        .citizenId(saved.getCitizenId())
+                        .createdAt(saved.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

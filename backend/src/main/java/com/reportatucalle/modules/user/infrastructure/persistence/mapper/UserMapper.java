@@ -24,6 +24,7 @@ public class UserMapper {
                 .firstName(jpaEntity.getFirstName())
                 .lastName(jpaEntity.getLastName())
                 .phone(jpaEntity.getPhone())
+                .civicScore(jpaEntity.getCivicScore() != null ? jpaEntity.getCivicScore() : 0)
                 .createdAt(jpaEntity.getCreatedAt())
                 .build();
     }
@@ -40,6 +41,7 @@ public class UserMapper {
                 .firstName(domain.getFirstName())
                 .lastName(domain.getLastName())
                 .phone(domain.getPhone())
+                .civicScore(domain.getCivicScore() != null ? domain.getCivicScore() : 0)
                 .createdAt(domain.getCreatedAt())
                 .build();
     }
@@ -55,6 +57,7 @@ public class UserMapper {
                 .firstName(domain.getFirstName())
                 .lastName(domain.getLastName())
                 .phone(domain.getPhone())
+                .civicScore(domain.getCivicScore() != null ? domain.getCivicScore() : 0)
                 .build();
     }
 }

@@ -26,6 +26,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(org.springframework.security.core.AuthenticationException ex) {
+        log.warn("Authentication failed: {}", ex.getMessage());
+        ErrorResponse response = new ErrorResponse("ERR_AUTH", "Credenciales inválidas. Verifica tu correo o contraseña.", List.of());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
         log.warn("Business rule violation: {}", ex.getMessage());
@@ -44,6 +51,13 @@ public class GlobalExceptionHandler {
 
         log.warn("Validation error on request: {}", validationErrors);
         ErrorResponse response = new ErrorResponse("ERR_VALIDATION", "Invalid request parameters", validationErrors);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.warn("Invalid argument: {}", ex.getMessage());
+        ErrorResponse response = new ErrorResponse("ERR_BAD_REQUEST", ex.getMessage(), List.of());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 

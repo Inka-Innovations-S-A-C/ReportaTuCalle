@@ -40,10 +40,14 @@ public class ReportMapper {
     public ReportResponse toResponse(Report report) {
         return new ReportResponse(
                 report.getId(),
+                report.getCitizenId(),
+                report.getCategoryId(),
+                report.getAssignedToUserId(),
                 report.getTitle(),
                 report.getDescription(),
                 report.getImageUrl(),
-                report.getStatus().name(),
+                report.getResolutionImageUrl(),
+                report.getStatus().getName(),
                 report.getReportCount(), // Mapeo del contador consolidado
                 report.getLocation().getY(), 
                 report.getLocation().getX(), 

@@ -1,5 +1,4 @@
--- 1. Para habilitar extensión espacial para mapas (obligatorio para coordenadas geográficas)
-CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public;
+-- 1. Para habilitar extensión espacial para mapas (Se asume que ya fue activado en Supabase Dashboard)
 
 -- 1.1 Crear esquemas según arquitectura
 CREATE SCHEMA IF NOT EXISTS rtc_auth;
@@ -52,7 +51,7 @@ CREATE TABLE report.reports (
     created_at timestamp(6) without time zone NOT NULL,
     description text NOT NULL,
     image_url character varying(500),
-    location public.geometry(Point,4326) NOT NULL,
+    location geometry(Point,4326) NOT NULL,
     report_count integer NOT NULL,
     status character varying(20) NOT NULL,
     title character varying(150) NOT NULL,

@@ -36,20 +36,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // 1. Obtener el header Authorization
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
+        // 1. Obtener el token del header o del parámetro de query (para SSE)
+        String authHeader = request.getHeader("Authorization");
+        String jwt = null;
         final String userEmail;
 
-        // 2. Si no hay header o no empieza con "Bearer ", delegamos al siguiente filtro
-        // (Por ejemplo, si es una ruta pública definida en SecurityConfig)
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+        } else if (request.getRequestURI().contains("/stream") && request.getParameter("token") != null) {
+            jwt = request.getParameter("token");
+        }
+
+        if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        // 3. Extraer el token (quitando los primeros 7 caracteres de "Bearer ")
-        jwt = authHeader.substring(7);
         userEmail = jwtService.extractUsername(jwt);
 
         // 4. Si tenemos email y el usuario aún no está autenticado en este contexto

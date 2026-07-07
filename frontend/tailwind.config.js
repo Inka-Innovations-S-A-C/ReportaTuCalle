@@ -7,34 +7,56 @@ export default {
   theme: {
     extend: {
       colors: {
-        verde: {
-          50:  '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
+        background: '#0B0F19',
+        surface: '#151C2C',
+        surfaceHighlight: '#1E293B',
+        primary: {
+          400: '#818CF8',
+          500: '#6366F1',
+          600: '#4F46E5',
+          glow: 'rgba(99, 102, 241, 0.4)'
         },
-        azul: {
-          50:  '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e3a5f',
-          900: '#0f2544',
+        accent: {
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
+          glow: 'rgba(16, 185, 129, 0.4)'
         },
+        warning: '#F59E0B',
+        danger: '#EF4444',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
       },
+      boxShadow: {
+        'glow': '0 0 20px rgba(99, 102, 241, 0.3)',
+        'glow-accent': '0 0 20px rgba(16, 185, 129, 0.3)',
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'slide-up': 'slideUp 0.5s ease-out forwards',
+        'fade-in': 'fadeIn 0.3s ease-out forwards',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        }
+      }
     },
   },
   plugins: [],

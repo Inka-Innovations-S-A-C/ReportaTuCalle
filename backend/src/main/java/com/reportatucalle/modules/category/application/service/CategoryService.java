@@ -2,6 +2,7 @@ package com.reportatucalle.modules.category.application.service;
 
 import com.reportatucalle.modules.category.application.dto.CategoryResponse;
 import com.reportatucalle.modules.category.application.dto.CreateCategoryRequest;
+import com.reportatucalle.modules.category.application.dto.UpdateCategoryRequest;
 import com.reportatucalle.modules.category.domain.entity.Category;
 import com.reportatucalle.modules.category.domain.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,8 @@ public class CategoryService {
                         category.getId(),
                         category.getName(),
                         category.getDescription(),
-                        category.getMarkerColor()
+                        category.getMarkerColor(),
+                        category.getAlgorithmType()
                 ))
                 .collect(Collectors.toList());
     }
@@ -70,7 +72,8 @@ public class CategoryService {
                         category.getId(),
                         category.getName(),
                         category.getDescription(),
-                        category.getMarkerColor()
+                        category.getMarkerColor(),
+                        category.getAlgorithmType()
                 ))
                 .orElse(null);
     }
@@ -114,8 +117,50 @@ public class CategoryService {
                 savedCategory.getId(),
                 savedCategory.getName(),
                 savedCategory.getDescription(),
-                savedCategory.getMarkerColor()
+                savedCategory.getMarkerColor(),
+                savedCategory.getAlgorithmType()
         );
+    }
+
+    /**
+     * Caso de Uso: Actualizar una categoría existente.
+     */
+    @Transactional
+    public CategoryResponse updateCategory(Long categoryId, UpdateCategoryRequest request) {
+        Category existingCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+
+        Category updatedCategory = Category.builder()
+                .id(existingCategory.getId())
+                .name(request.name() != null ? request.name() : existingCategory.getName())
+                .description(request.description() != null ? request.description() : existingCategory.getDescription())
+                .markerColor(request.markerColor() != null ? request.markerColor() : existingCategory.getMarkerColor())
+                .algorithmType(request.algorithmType() != null ? request.algorithmType() : existingCategory.getAlgorithmType())
+                .isActive(request.isActive() != null ? request.isActive() : existingCategory.getIsActive())
+                .createdAt(existingCategory.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        Category savedCategory = categoryRepository.save(updatedCategory);
+
+        return new CategoryResponse(
+                savedCategory.getId(),
+                savedCategory.getName(),
+                savedCategory.getDescription(),
+                savedCategory.getMarkerColor(),
+                savedCategory.getAlgorithmType()
+        );
+    }
+
+    /**
+     * Caso de Uso: Eliminar una categoría.
+     */
+    @Transactional
+    public void deleteCategory(Long categoryId) {
+        if (!categoryRepository.findById(categoryId).isPresent()) {
+            throw new IllegalArgumentException("Categoría no encontrada");
+        }
+        categoryRepository.deleteById(categoryId);
     }
 }
 

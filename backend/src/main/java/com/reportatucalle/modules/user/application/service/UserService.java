@@ -2,6 +2,7 @@ package com.reportatucalle.modules.user.application.service;
 
 import com.reportatucalle.modules.auth.infrastructure.persistence.entity.AuthAccountJpaEntity;
 import com.reportatucalle.modules.user.application.dto.UserProfileResponse;
+import com.reportatucalle.modules.user.application.dto.UserProfileSummaryResponse;
 import com.reportatucalle.modules.user.application.dto.UpdateProfileRequest;
 import com.reportatucalle.modules.user.domain.entity.UserProfile;
 import com.reportatucalle.modules.user.domain.repository.UserProfileRepository;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Servicio del módulo User.
@@ -68,6 +71,7 @@ public class UserService {
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .phone(request.phone())
+                .civicScore(existing.getCivicScore())
                 .createdAt(existing.getCreatedAt())
                 .build();
 
@@ -90,7 +94,40 @@ public class UserService {
                 account.getEmail(),
                 account.getRole().name(),
                 profile.getPhone(),
+                profile.getCivicScore(),
                 profile.getCreatedAt()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserProfileSummaryResponse> getAllUsers() {
+        return userProfileRepository.findAll().stream()
+                .map(profile -> new UserProfileSummaryResponse(
+                        profile.getId(),
+                        profile.getAccountId(),
+                        profile.getFullName(),
+                        profile.getFirstName(),
+                        profile.getLastName(),
+                        profile.getPhone(),
+                        profile.getCivicScore(),
+                        profile.getCreatedAt()
+                ))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserProfileSummaryResponse> getLeaderboard() {
+        return userProfileRepository.findTopCitizens(10).stream()
+                .map(profile -> new UserProfileSummaryResponse(
+                        profile.getId(),
+                        profile.getAccountId(),
+                        profile.getFullName(),
+                        profile.getFirstName(),
+                        profile.getLastName(),
+                        profile.getPhone(),
+                        profile.getCivicScore(),
+                        profile.getCreatedAt()
+                ))
+                .collect(java.util.stream.Collectors.toList());
     }
 }

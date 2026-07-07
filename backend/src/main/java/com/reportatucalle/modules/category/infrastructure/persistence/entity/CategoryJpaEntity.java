@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
  * - NONE: Sin algoritmo específico, solo visualización en mapa
  */
 @Entity
-@Table(name = "categories")
+@Table(name = "categories", schema = "category")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -56,10 +56,15 @@ public class ReportPersistenceAdapter implements ReportRepository {
         return jpaRepository.findById(id)
                 .map(mapper::toDomain);
     }
+    
+    @Override
+    public void deleteById(Long id) {
+        jpaRepository.deleteById(id);
+    }
 
     @Override
     public List<Report> findByStatus(ReportStatus status) {
-        return jpaRepository.findByStatus(status)
+        return jpaRepository.findByStatus(status.getName())
                 .stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
@@ -69,6 +74,42 @@ public class ReportPersistenceAdapter implements ReportRepository {
     public List<Report> findByCitizenId(Long citizenId) {
         return jpaRepository.findByCitizenId(citizenId)
                 .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Report> findByAssignedToUserId(Long assignedToUserId) {
+        return jpaRepository.findByAssignedToUserId(assignedToUserId).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<Report> findByAssignedToUserIdAndStatusIn(Long assignedToUserId, List<ReportStatus> statuses) {
+        List<String> statusNames = statuses.stream().map(ReportStatus::getName).collect(Collectors.toList());
+        return jpaRepository.findByAssignedToUserIdAndStatusIn(assignedToUserId, statusNames).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<Report> findTop30ByAssignedToUserIdAndStatusOrderByCreatedAtDesc(Long assignedToUserId, ReportStatus status) {
+        return jpaRepository.findTop30ByAssignedToUserIdAndStatusOrderByCreatedAtDesc(assignedToUserId, status.getName()).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Report> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Report> findAllById(List<Long> ids) {
+        return jpaRepository.findAllById(ids).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }

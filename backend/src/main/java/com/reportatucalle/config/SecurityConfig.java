@@ -46,7 +46,10 @@ public class SecurityConfig {
             
             ////IMPORTANTE: Carpeta de imágenes.
             // Sube la foto quien tiene Token, pero cualquiera puede verla en el navegador.
-            "/uploads/**" 
+            "/uploads/**",
+            
+            // WebSockets
+            "/ws-tracking/**" 
     };
 
     @Bean

@@ -2,6 +2,7 @@ package com.reportatucalle.modules.report.infrastructure.persistence.mapper;
 
 import com.reportatucalle.modules.report.domain.entity.Report;
 import com.reportatucalle.modules.report.infrastructure.persistence.entity.ReportJpaEntity;
+import com.reportatucalle.modules.report.domain.entity.ReportStatusFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,11 +24,12 @@ public class ReportPersistenceMapper {
                 .id(jpaEntity.getId())
                 .citizenId(jpaEntity.getCitizenId())
                 .categoryId(jpaEntity.getCategoryId())
+                .assignedToUserId(jpaEntity.getAssignedToUserId())
                 .title(jpaEntity.getTitle())
                 .description(jpaEntity.getDescription())
                 .imageUrl(jpaEntity.getImageUrl())
                 .location(jpaEntity.getLocation())
-                .status(jpaEntity.getStatus())
+                .status(ReportStatusFactory.fromString(jpaEntity.getStatus()))
                 .reportCount(jpaEntity.getReportCount())
                 .createdAt(jpaEntity.getCreatedAt())
                 .updatedAt(jpaEntity.getUpdatedAt())
@@ -44,11 +46,12 @@ public class ReportPersistenceMapper {
                 .id(domain.getId())
                 .citizenId(domain.getCitizenId())
                 .categoryId(domain.getCategoryId())
+                .assignedToUserId(domain.getAssignedToUserId())
                 .title(domain.getTitle())
                 .description(domain.getDescription())
                 .imageUrl(domain.getImageUrl())
                 .location(domain.getLocation())
-                .status(domain.getStatus())
+                .status(domain.getStatus().getName())
                 .reportCount(domain.getReportCount())
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
@@ -64,11 +67,12 @@ public class ReportPersistenceMapper {
         return ReportJpaEntity.builder()
                 .citizenId(domain.getCitizenId())
                 .categoryId(domain.getCategoryId())
+                .assignedToUserId(domain.getAssignedToUserId())
                 .title(domain.getTitle())
                 .description(domain.getDescription())
                 .imageUrl(domain.getImageUrl())
                 .location(domain.getLocation())
-                .status(domain.getStatus())
+                .status(domain.getStatus().getName())
                 .reportCount(domain.getReportCount())
                 .build();
     }

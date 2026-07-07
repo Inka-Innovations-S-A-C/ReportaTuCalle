@@ -22,6 +22,7 @@ public class UserProfile {
     private final String firstName;
     private final String lastName;
     private final String phone; // Opcional
+    private final Integer civicScore;
     private final LocalDateTime createdAt;
     
     /**

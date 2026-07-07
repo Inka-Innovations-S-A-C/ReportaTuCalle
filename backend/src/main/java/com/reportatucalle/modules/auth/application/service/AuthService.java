@@ -1,10 +1,13 @@
 package com.reportatucalle.modules.auth.application.service;
 
 import com.reportatucalle.modules.auth.application.dto.AuthResponse;
+import com.reportatucalle.modules.auth.application.dto.AuthAccountResponse;
 import com.reportatucalle.modules.auth.application.dto.LoginRequest;
 import com.reportatucalle.modules.auth.application.dto.RegisterRequest;
+import com.reportatucalle.modules.auth.application.dto.UpdateRoleRequest;
 import com.reportatucalle.modules.auth.application.mapper.AuthMapper;
 import com.reportatucalle.modules.auth.domain.entity.AuthAccount;
+import com.reportatucalle.modules.auth.domain.entity.Role;
 import com.reportatucalle.modules.auth.domain.repository.AuthAccountRepository;
 import com.reportatucalle.modules.auth.infrastructure.persistence.repository.AuthAccountJpaRepository;
 import com.reportatucalle.modules.user.domain.entity.UserProfile;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Orquestador principal de la autenticación.
@@ -104,5 +109,40 @@ public class AuthService {
         );
 
         return new AuthResponse(jwtToken);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AuthAccountResponse> getAllAccounts() {
+        return authAccountRepository.findAll().stream()
+                .map(account -> new AuthAccountResponse(
+                        account.getId(),
+                        account.getEmail(),
+                        account.getRole().name(),
+                        account.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public AuthAccountResponse updateRole(Long accountId, UpdateRoleRequest request) {
+        AuthAccount account = authAccountRepository.findById(accountId)
+                .orElseThrow(() -> new BusinessException("Cuenta no encontrada", "ACCOUNT_NOT_FOUND"));
+        
+        AuthAccount updated = AuthAccount.builder()
+                .id(account.getId())
+                .email(account.getEmail())
+                .passwordHash(account.getPasswordHash())
+                .role(Role.valueOf(request.role()))
+                .createdAt(account.getCreatedAt())
+                .build();
+                
+        AuthAccount saved = authAccountRepository.save(updated);
+        
+        return new AuthAccountResponse(
+                saved.getId(),
+                saved.getEmail(),
+                saved.getRole().name(),
+                saved.getCreatedAt()
+        );
     }
 }

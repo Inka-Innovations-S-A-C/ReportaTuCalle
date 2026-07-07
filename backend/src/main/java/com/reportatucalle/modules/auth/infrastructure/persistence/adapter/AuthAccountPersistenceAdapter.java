@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.List;
 
 /**
  * Adaptador de persistencia: Implementa el puerto AuthAccountRepository.
@@ -27,7 +28,7 @@ public class AuthAccountPersistenceAdapter implements AuthAccountRepository {
     
     @Override
     public AuthAccount save(AuthAccount authAccount) {
-        AuthAccountJpaEntity jpaEntity = mapper.toJpaEntityForCreation(authAccount);
+        AuthAccountJpaEntity jpaEntity = mapper.toJpaEntity(authAccount);
         AuthAccountJpaEntity saved = jpaRepository.save(jpaEntity);
         return mapper.toDomain(saved);
     }
@@ -52,5 +53,12 @@ public class AuthAccountPersistenceAdapter implements AuthAccountRepository {
     @Override
     public boolean existsById(Long id) {
         return jpaRepository.existsById(id);
+    }
+    
+    @Override
+    public List<AuthAccount> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

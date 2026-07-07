@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * Vincula a un ciudadano secundario con un reporte ya existente (Patrón Observer en BD).
  */
 @Entity
-@Table(name = "report_endorsements")
+@Table(name = "report_endorsements", schema = "report")
 @Getter
 @Setter
 @Builder

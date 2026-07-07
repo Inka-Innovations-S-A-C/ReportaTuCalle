@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.List;
 
 /**
  * Adaptador de persistencia: Implementa el puerto UserProfileRepository.
@@ -27,7 +28,7 @@ public class UserProfilePersistenceAdapter implements UserProfileRepository {
     
     @Override
     public UserProfile save(UserProfile userProfile) {
-        UserProfileJpaEntity jpaEntity = mapper.toJpaEntityForCreation(userProfile);
+        UserProfileJpaEntity jpaEntity = mapper.toJpaEntity(userProfile);
         UserProfileJpaEntity saved = jpaRepository.save(jpaEntity);
         return mapper.toDomain(saved);
     }
@@ -52,5 +53,21 @@ public class UserProfilePersistenceAdapter implements UserProfileRepository {
     @Override
     public boolean existsByAccountId(Long accountId) {
         return jpaRepository.existsByAccountId(accountId);
+    }
+    
+    @Override
+    public List<UserProfile> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public List<UserProfile> findTopCitizens(int limit) {
+        // En un caso real limitariamos según 'limit', pero usaremos Top10 para simplificar
+        return jpaRepository.findTop10ByOrderByCivicScoreDesc().stream()
+                .map(mapper::toDomain)
+                .limit(limit)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
-import com.reportatucalle.modules.report.domain.entity.ReportStatus;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
  * Separada del dominio puro para no contaminarlo
  */
 @Entity
-@Table(name = "reports")
+@Table(name = "reports", schema = "report")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,21 +36,26 @@ public class ReportJpaEntity {
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
     
+    @Column(name = "assigned_to_user_id")
+    private Long assignedToUserId;
+    
     @Column(nullable = false, length = 150)
     private String title;
     
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
     
-    @Column(name = "image_url", length = 500)
+    @Column(name = "image_url")
     private String imageUrl;
+
+    @Column(name = "resolution_image_url")
+    private String resolutionImageUrl;
     
     @Column(nullable = false, columnDefinition = "geometry(Point, 4326)")
     private Point location;
     
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private ReportStatus status;
+    private String status;
     
     @Builder.Default
     @Column(name = "report_count", nullable = false)
@@ -68,7 +72,7 @@ public class ReportJpaEntity {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         if (this.status == null) {
-            this.status = ReportStatus.PENDING;
+            this.status = "PENDING";
         }
     }
     

@@ -16,5 +16,6 @@ public record UserProfileResponse(
         String email,
         String role,
         String phone,
+        Integer civicScore,
         LocalDateTime createdAt
 ) {}

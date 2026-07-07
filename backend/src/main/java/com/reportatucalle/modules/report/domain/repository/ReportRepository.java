@@ -28,6 +28,11 @@ public interface ReportRepository {
     Optional<Report> findById(Long id);
     
     /**
+     * Elimina un reporte por ID.
+     */
+    void deleteById(Long id);
+    
+    /**
      * Busca todos los reportes con un estado específico.
      */
     List<Report> findByStatus(ReportStatus status);
@@ -36,6 +41,26 @@ public interface ReportRepository {
      * Busca todos los reportes creados por un ciudadano.
      */
     List<Report> findByCitizenId(Long citizenId);
+    
+    /**
+     * Busca todos los reportes asignados a un supervisor.
+     */
+    List<Report> findByAssignedToUserId(Long assignedToUserId);
+    
+    /**
+     * Busca reportes asignados a un supervisor filtrando por múltiples estados.
+     */
+    List<Report> findByAssignedToUserIdAndStatusIn(Long assignedToUserId, List<ReportStatus> statuses);
+    
+    /**
+     * Busca los últimos 30 reportes resueltos asignados a un supervisor.
+     */
+    List<Report> findTop30ByAssignedToUserIdAndStatusOrderByCreatedAtDesc(Long assignedToUserId, ReportStatus status);
+    
+    /**
+     * Busca todos los reportes.
+     */
+    List<Report> findAll();
     
     /**
      * Busca reportes dentro de un radio geográfico usando PostGIS.
@@ -47,4 +72,9 @@ public interface ReportRepository {
      * Usado para consolidación inteligente (no duplicar reportes).
      */
     Optional<Report> findExistingDuplicate(Long categoryId, Point location, double radiusInMeters);
+    
+    /**
+     * Busca multiples reportes por sus IDs.
+     */
+    List<Report> findAllById(List<Long> ids);
 }

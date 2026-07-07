@@ -23,7 +23,7 @@ import java.util.List;
  * ✅ Separada del dominio puro para no contaminarlo
  */
 @Entity
-@Table(name = "auth_accounts", schema = "auth")
+@Table(name = "auth_accounts", schema = "rtc_auth")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

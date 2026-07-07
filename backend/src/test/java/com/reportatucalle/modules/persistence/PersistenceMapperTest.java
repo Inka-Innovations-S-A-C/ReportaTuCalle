@@ -71,7 +71,7 @@ class PersistenceMapperTest {
         var point = geometryFactory.createPoint(new Coordinate(-77, -12));
         ReportJpaEntity jpa = ReportJpaEntity.builder()
                 .id(3L).citizenId(4L).categoryId(5L).title("T").description("D")
-                .imageUrl("img").location(point).status(ReportStatus.PENDING)
+                .imageUrl("img").location(point).status("PENDING")
                 .reportCount(2).createdAt(now).updatedAt(now).build();
 
         Report domain = mapper.toDomain(jpa);
@@ -79,7 +79,7 @@ class PersistenceMapperTest {
         ReportJpaEntity creation = mapper.toJpaEntityForCreation(domain);
 
         assertEquals(4L, domain.getCitizenId());
-        assertEquals(ReportStatus.PENDING, back.getStatus());
+        assertEquals("PENDING", back.getStatus());
         assertNull(creation.getId());
         assertNull(mapper.toDomain(null));
         assertNull(mapper.toJpaEntity(null));

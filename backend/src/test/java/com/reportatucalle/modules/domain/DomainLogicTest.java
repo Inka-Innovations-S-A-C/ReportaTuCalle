@@ -7,6 +7,7 @@ import com.reportatucalle.modules.category.domain.entity.Category;
 import com.reportatucalle.modules.media.domain.entity.Media;
 import com.reportatucalle.modules.report.domain.entity.Report;
 import com.reportatucalle.modules.report.domain.entity.ReportStatus;
+import com.reportatucalle.modules.report.domain.entity.ReportStatusFactory;
 import com.reportatucalle.modules.user.domain.entity.UserProfile;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -78,10 +79,10 @@ class DomainLogicTest {
 
     @Test
     void report_validatesStatusSeverityAndBuilderRequirements() {
-        Report pending = report(ReportStatus.PENDING, 1);
-        Report inProgress = report(ReportStatus.IN_PROGRESS, 2);
-        Report resolved = report(ReportStatus.RESOLVED, 3);
-        Report critical = report(ReportStatus.REJECTED, 5);
+        Report pending = report(ReportStatusFactory.fromString("PENDING"), 1);
+        Report inProgress = report(ReportStatusFactory.fromString("IN_PROGRESS"), 2);
+        Report resolved = report(ReportStatusFactory.fromString("RESOLVED"), 3);
+        Report critical = report(ReportStatusFactory.fromString("REJECTED"), 5);
 
         assertTrue(pending.isValid());
         assertTrue(pending.isActive());

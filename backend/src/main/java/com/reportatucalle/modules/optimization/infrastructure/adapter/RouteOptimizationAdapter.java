@@ -46,7 +46,7 @@ public class RouteOptimizationAdapter implements RouteOptimizationPort {
     @Override
     public OptimizedRoute calculateOptimalRoute(Coordinate startPoint, List<Coordinate> destinations) {
         if (destinations.isEmpty()) {
-            return new OptimizedRoute(List.of(startPoint), 0.0);
+            return new OptimizedRoute(List.of(startPoint), 0.0, java.util.Map.of());
         }
         
         List<Coordinate> orderedStops = new ArrayList<>();
@@ -58,32 +58,40 @@ public class RouteOptimizationAdapter implements RouteOptimizationPort {
         double totalDistance = 0.0;
         
         while (!remaining.isEmpty()) {
-            // Encontrar el destino más cercano
-            Coordinate nearest = remaining.get(0);
-            double minDistance = calculateDistance(current, nearest);
-            int nearestIndex = 0;
+            // Encontrar el destino más óptimo (TSP Ponderado por Impacto Ciudadano / Endorsements)
+            Coordinate bestNext = remaining.get(0);
+            double bestHeuristic = Double.MAX_VALUE;
+            double actualDistanceToBest = 0.0;
+            int bestIndex = 0;
             
-            for (int i = 1; i < remaining.size(); i++) {
+            for (int i = 0; i < remaining.size(); i++) {
                 Coordinate candidate = remaining.get(i);
                 double distance = calculateDistance(current, candidate);
                 
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nearest = candidate;
-                    nearestIndex = i;
+                // Fórmula de la tesis: 
+                // A mayor cantidad de endorsements (reportCount), el "costo" matemático se reduce.
+                // Esto engaña al TSP haciéndole creer que los reportes más votados están "más cerca",
+                // priorizando su atención.
+                double heuristicCost = distance / (1.0 + (candidate.reportCount() * 0.5));
+                
+                if (heuristicCost < bestHeuristic) {
+                    bestHeuristic = heuristicCost;
+                    bestNext = candidate;
+                    actualDistanceToBest = distance;
+                    bestIndex = i;
                 }
             }
             
-            // Agregar el más cercano a la ruta
-            orderedStops.add(nearest);
-            totalDistance += minDistance;
+            // Agregar el mejor a la ruta
+            orderedStops.add(bestNext);
+            totalDistance += actualDistanceToBest;
             
             // Remover de los destinos pendientes
-            remaining.remove(nearestIndex);
-            current = nearest;
+            remaining.remove(bestIndex);
+            current = bestNext;
         }
         
-        return new OptimizedRoute(orderedStops, totalDistance);
+        return new OptimizedRoute(orderedStops, totalDistance, java.util.Map.of());
     }
     
     /**

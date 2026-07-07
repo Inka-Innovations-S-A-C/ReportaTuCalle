@@ -2,11 +2,16 @@ package com.reportatucalle.modules.optimization.application.service;
 
 import com.reportatucalle.modules.category.application.api.CategoryFacade;
 import com.reportatucalle.modules.category.domain.entity.AlgorithmType;
+import com.reportatucalle.modules.optimization.application.dto.RouteHistoryResponse;
+import com.reportatucalle.modules.optimization.application.dto.SaveRouteRequest;
+import com.reportatucalle.modules.optimization.application.dto.UpdateRouteStatusRequest;
 import com.reportatucalle.modules.optimization.domain.models.Coordinate;
 import com.reportatucalle.modules.optimization.domain.models.OptimizedRoute;
-import com.reportatucalle.modules.optimization.domain.portsout.ConnectivityOptimizationPort;
-import com.reportatucalle.modules.optimization.domain.portsout.FlowOptimizationPort;
-import com.reportatucalle.modules.optimization.domain.portsout.RouteOptimizationPort;
+import com.reportatucalle.modules.optimization.domain.models.RouteHistory;
+import com.reportatucalle.modules.optimization.domain.models.RouteHistoryStatus;
+import com.reportatucalle.modules.optimization.domain.portsout.RouteHistoryRepository;
+import com.reportatucalle.modules.optimization.application.strategy.OptimizationStrategy;
+import com.reportatucalle.shared.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +43,8 @@ import java.util.Optional;
 public class RouteOptimizationService {
 
     private final CategoryFacade categoryFacade;
-    private final RouteOptimizationPort routeOptimizationPort;
-    private final FlowOptimizationPort flowOptimizationPort;
-    private final ConnectivityOptimizationPort connectivityOptimizationPort;
+    private final List<OptimizationStrategy> optimizationStrategies;
+    private final RouteHistoryRepository routeHistoryRepository;
 
     /**
      * Calcula la ruta optimizada para reportes de una categoría específica.
@@ -83,37 +87,14 @@ public class RouteOptimizationService {
     private Optional<OptimizedRoute> executeStrategy(AlgorithmType algorithmType,
                                                      Coordinate startPoint,
                                                      List<Coordinate> destinations) {
+        if (algorithmType == AlgorithmType.NONE) {
+            return Optional.empty();
+        }
 
-        return switch (algorithmType) {
-
-            // TSP/VRP: Enrutamiento para maximizar eficiencia (baches, basura, etc.)
-            case ROUTING -> {
-                OptimizedRoute route = routeOptimizationPort.calculateOptimalRoute(startPoint, destinations);
-                yield Optional.of(route);
-            }
-
-            // Flujo Máximo: Para problemas de distribución (fugas de agua, etc.)
-            // El último destino actúa como sumidero (sink) de la red
-            case FLOW -> {
-                Coordinate sink = destinations.get(destinations.size() - 1);
-                List<Coordinate> network = destinations.subList(0, destinations.size() - 1);
-                OptimizedRoute route = flowOptimizationPort.calculateMaxFlow(startPoint, sink, network);
-                yield Optional.of(route);
-            }
-
-            // Árbol de Expansión Mínima: Conectividad (semáforos, postes, etc.)
-            // Se incluye el startPoint como nodo más de la red a conectar
-            case CONNECTIVITY -> {
-                List<Coordinate> allNodes = new ArrayList<>();
-                allNodes.add(startPoint);
-                allNodes.addAll(destinations);
-                OptimizedRoute route = connectivityOptimizationPort.calculateMinimumSpanningTree(allNodes);
-                yield Optional.of(route);
-            }
-
-            // Sin algoritmo: Solo visualización, sin optimización
-            case NONE -> Optional.empty();
-        };
+        return optimizationStrategies.stream()
+                .filter(strategy -> strategy.supports(algorithmType))
+                .findFirst()
+                .flatMap(strategy -> strategy.optimize(startPoint, destinations));
     }
 
     /**
@@ -128,5 +109,54 @@ public class RouteOptimizationService {
         return algorithmType
                 .map(type -> type != AlgorithmType.NONE)
                 .orElse(false);
+    }
+
+    public RouteHistoryResponse saveRoute(SaveRouteRequest request) {
+        RouteHistory history = RouteHistory.builder()
+                .supervisorId(request.supervisorId())
+                .categoryId(request.categoryId())
+                .routeDataJson(request.routeDataJson())
+                .totalDistanceKm(request.totalDistanceKm())
+                .status(RouteHistoryStatus.SAVED)
+                .build();
+                
+        RouteHistory saved = routeHistoryRepository.save(history);
+        return toResponse(saved);
+    }
+
+    public List<RouteHistoryResponse> getRoutesBySupervisorId(Long supervisorId) {
+        return routeHistoryRepository.findBySupervisorId(supervisorId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public RouteHistoryResponse updateRouteStatus(Long id, UpdateRouteStatusRequest request) {
+        RouteHistory existing = routeHistoryRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Ruta no encontrada", "ROUTE_NOT_FOUND"));
+                
+        RouteHistory updated = RouteHistory.builder()
+                .id(existing.getId())
+                .supervisorId(existing.getSupervisorId())
+                .categoryId(existing.getCategoryId())
+                .routeDataJson(existing.getRouteDataJson())
+                .totalDistanceKm(existing.getTotalDistanceKm())
+                .status(RouteHistoryStatus.valueOf(request.status()))
+                .createdAt(existing.getCreatedAt())
+                .build();
+                
+        RouteHistory saved = routeHistoryRepository.save(updated);
+        return toResponse(saved);
+    }
+
+    private RouteHistoryResponse toResponse(RouteHistory history) {
+        return new RouteHistoryResponse(
+                history.getId(),
+                history.getSupervisorId(),
+                history.getCategoryId(),
+                history.getRouteDataJson(),
+                history.getTotalDistanceKm(),
+                history.getStatus().name(),
+                history.getCreatedAt()
+        );
     }
 }

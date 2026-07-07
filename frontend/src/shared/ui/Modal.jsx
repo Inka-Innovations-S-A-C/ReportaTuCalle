@@ -12,7 +12,7 @@ function Modal({ abierto, onCerrar, titulo, children }) {
   if (!abierto) return null
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-[2000] flex items-end sm:items-start sm:pt-[10vh] justify-center">
       {/* Fondo oscuro */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"

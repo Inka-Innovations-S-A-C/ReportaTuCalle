@@ -76,14 +76,9 @@ export function useRegistro() {
         email: formulario.email,
         password: formulario.password,
       })
-      // El backend devuelve token en el registro → auto-login directo al dashboard
-      if (respuesta?.token) {
-        iniciarSesion(respuesta.token, { email: formulario.email })
-        navegar('/dashboard', { replace: true })
-      } else {
-        setMensajeExito('¡Cuenta creada! Redirigiendo al login...')
-        setTimeout(() => navegar('/login', { replace: true }), 1500)
-      }
+      // Solo registramos, no iniciamos sesión automáticamente
+      setMensajeExito('¡Cuenta creada! Redirigiendo al login...')
+      setTimeout(() => navegar('/login', { replace: true }), 1500)
     } catch (error) {
       const status = error.response?.status
       const mensajeServidor = error.response?.data?.message ?? error.response?.data?.error

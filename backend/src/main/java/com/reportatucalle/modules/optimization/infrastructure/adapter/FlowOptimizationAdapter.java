@@ -57,11 +57,17 @@ public class FlowOptimizationAdapter implements FlowOptimizationPort {
             }
         }
 
+        // Calculate max flow total
+        int maxFlow = 0;
+        for (int i = 0; i < n; i++) {
+            maxFlow += flow[sourceIdx][i];
+        }
+
         // Lo que le interesa al supervisor: el camino ordenado de coordenadas
         List<Coordinate> path = reconstructPath(flow, allNodes, sourceIdx, sinkIdx, n);
         double totalDistance = calculateTotalDistance(path);
 
-        return new OptimizedRoute(path, totalDistance);
+        return new OptimizedRoute(path, totalDistance, Map.of("maxFlow", maxFlow));
     }
 
     private int[][] buildCapacityMatrix(List<Coordinate> nodes, int n) {
@@ -101,24 +107,34 @@ public class FlowOptimizationAdapter implements FlowOptimizationPort {
     private List<Coordinate> reconstructPath(int[][] flow, List<Coordinate> nodes,
                                               int source, int sink, int n) {
         List<Coordinate> path = new ArrayList<>();
-        boolean[] visited = new boolean[n];
-        int current = source;
+        path.add(nodes.get(source));
 
-        path.add(nodes.get(current));
-        visited[current] = true;
-
-        while (current != sink) {
-            boolean moved = false;
-            for (int next = 0; next < n; next++) {
-                if (!visited[next] && flow[current][next] > 0) {
-                    path.add(nodes.get(next));
-                    visited[next] = true;
-                    current = next;
-                    moved = true;
-                    break;
-                }
+        // Extraer nodos intermedios
+        List<Integer> intermediateNodes = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (i != source && i != sink) {
+                intermediateNodes.add(i);
             }
-            if (!moved) break;
+        }
+
+        // Ordenar nodos intermedios por la cantidad de flujo total que manejan (descendente)
+        // Esto le da al supervisor una ruta que prioriza los puntos con mayor "flujo"
+        intermediateNodes.sort((a, b) -> {
+            int flowA = 0;
+            int flowB = 0;
+            for (int j = 0; j < n; j++) {
+                flowA += Math.max(0, flow[j][a]);
+                flowB += Math.max(0, flow[j][b]);
+            }
+            return Integer.compare(flowB, flowA);
+        });
+
+        for (int idx : intermediateNodes) {
+            path.add(nodes.get(idx));
+        }
+
+        if (source != sink) {
+            path.add(nodes.get(sink));
         }
 
         return path;

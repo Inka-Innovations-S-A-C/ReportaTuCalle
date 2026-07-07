@@ -2,6 +2,8 @@ package com.reportatucalle.modules.auth.application.service;
 
 import com.reportatucalle.modules.auth.application.dto.LoginRequest;
 import com.reportatucalle.modules.auth.application.dto.RegisterRequest;
+import com.reportatucalle.modules.auth.application.dto.AuthAccountResponse;
+import com.reportatucalle.modules.auth.application.dto.UpdateRoleRequest;
 import com.reportatucalle.modules.auth.application.mapper.AuthMapper;
 import com.reportatucalle.modules.auth.domain.entity.AuthAccount;
 import com.reportatucalle.modules.auth.domain.entity.Role;
@@ -18,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -101,5 +104,31 @@ class AuthServiceTest {
         BusinessException ex = assertThrows(BusinessException.class, () -> authService.login(request));
 
         assertEquals("ACCOUNT_NOT_FOUND", ex.getErrorCode());
+    }
+
+    @Test
+    void getAllAccounts_returnsMappedResponses() {
+        AuthAccount account1 = AuthAccount.builder().id(1L).email("a@a.com").role(Role.CITIZEN).build();
+        AuthAccount account2 = AuthAccount.builder().id(2L).email("b@b.com").role(Role.SUPERVISOR).build();
+        when(authRepository.findAll()).thenReturn(List.of(account1, account2));
+
+        List<AuthAccountResponse> result = authService.getAllAccounts();
+
+        assertEquals(2, result.size());
+        assertEquals("a@a.com", result.get(0).email());
+        assertEquals("SUPERVISOR", result.get(1).role());
+    }
+
+    @Test
+    void updateRole_whenExists_updatesAndReturnsResponse() {
+        AuthAccount existing = AuthAccount.builder().id(1L).email("a@a.com").passwordHash("x").role(Role.CITIZEN).build();
+        when(authRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(authRepository.save(any(AuthAccount.class))).thenAnswer(i -> i.getArgument(0));
+
+        UpdateRoleRequest request = new UpdateRoleRequest("SUPERVISOR");
+        AuthAccountResponse response = authService.updateRole(1L, request);
+
+        assertEquals("SUPERVISOR", response.role());
+        verify(authRepository).save(any(AuthAccount.class));
     }
 }

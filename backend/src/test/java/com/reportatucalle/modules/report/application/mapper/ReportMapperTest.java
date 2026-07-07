@@ -4,6 +4,7 @@ import com.reportatucalle.modules.report.application.dto.CreateReportRequest;
 import com.reportatucalle.modules.report.application.dto.ReportResponse;
 import com.reportatucalle.modules.report.domain.entity.Report;
 import com.reportatucalle.modules.report.domain.entity.ReportStatus;
+import com.reportatucalle.modules.report.domain.entity.ReportStatusFactory;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -30,7 +31,7 @@ class ReportMapperTest {
         assertEquals("Bache grande", report.getTitle());
         assertEquals(-77.03, report.getLocation().getX(), 0.000001);
         assertEquals(-12.05, report.getLocation().getY(), 0.000001);
-        assertEquals(ReportStatus.PENDING, report.getStatus());
+        assertEquals(ReportStatusFactory.fromString("PENDING").getName(), report.getStatus().getName());
         assertEquals(1, report.getReportCount());
     }
 
@@ -38,14 +39,15 @@ class ReportMapperTest {
     void toResponse_mapsDomainReportToDto() {
         LocalDateTime createdAt = LocalDateTime.of(2026, 6, 9, 10, 0);
         Report report = Report.builder()
-                .id(15L).citizenId(1L).categoryId(2L)
+                .id(15L).citizenId(1L).categoryId(2L).assignedToUserId(50L)
                 .title("Poste caído").description("Peligroso").imageUrl("img.png")
                 .location(geometryFactory.createPoint(new Coordinate(-77.01, -12.01)))
-                .status(ReportStatus.IN_PROGRESS).reportCount(4).createdAt(createdAt).build();
+                .status(ReportStatusFactory.fromString("IN_PROGRESS")).reportCount(4).createdAt(createdAt).build();
 
         ReportResponse response = mapper.toResponse(report);
 
         assertEquals(15L, response.id());
+        assertEquals(50L, response.assignedToUserId());
         assertEquals("Poste caído", response.title());
         assertEquals("IN_PROGRESS", response.status());
         assertEquals(4, response.reportCount());

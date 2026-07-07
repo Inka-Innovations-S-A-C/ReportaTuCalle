@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { User, Mail, Phone, ShieldCheck, Calendar, Edit2, X, Check } from 'lucide-react'
+import { User, Mail, Phone, ShieldCheck, Calendar, Edit2, X, Check, Award } from 'lucide-react'
 import Navbar from '../../../shared/ui/Navbar'
 import Spinner from '../../../shared/ui/Spinner'
 import AlertaMensaje from '../../../shared/ui/AlertaMensaje'
@@ -141,6 +141,9 @@ function PerfilPage() {
             <InfoFila icono={Mail} etiqueta="Correo" valor={perfil?.email ?? '—'} />
             <InfoFila icono={Phone} etiqueta="Teléfono" valor={perfil?.phone || 'No registrado'} />
             <InfoFila icono={ShieldCheck} etiqueta="Rol" valor={rolConfig.label} />
+            {perfil?.role === 'CITIZEN' && (
+              <InfoFila icono={Award} etiqueta="Puntos Cívicos" valor={`${perfil?.civicScore ?? 0} pts`} />
+            )}
             <InfoFila icono={Calendar} etiqueta="Miembro desde" valor={fechaRegistro} />
           </div>
         )}

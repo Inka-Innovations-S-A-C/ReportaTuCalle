@@ -18,8 +18,8 @@ function RegisterForm({
 }) {
   return (
     <>
-      <h2 className="text-xl font-semibold text-gray-800 mb-1">Crear cuenta</h2>
-      <p className="text-sm text-gray-500 mb-6">Únete a la comunidad ciudadana</p>
+      <h2 className="text-2xl font-bold text-gray-100 mb-1 tracking-tight">Crear cuenta</h2>
+      <p className="text-sm text-gray-400 mb-8 font-light">Únete a la comunidad ciudadana</p>
 
       {mensajeError && (
         <div className="mb-4">
@@ -107,9 +107,9 @@ function RegisterForm({
         </Boton>
       </form>
 
-      <p className="text-center text-sm text-gray-500 mt-6">
+      <p className="text-center text-sm text-gray-400 mt-6">
         ¿Ya tienes cuenta?{' '}
-        <Link to="/login" className="text-verde-600 font-semibold hover:underline focus:outline-none focus:underline">
+        <Link to="/login" className="text-primary-400 font-semibold hover:text-primary-300 hover:underline focus:outline-none focus:underline transition-colors">
           Iniciar sesión
         </Link>
       </p>

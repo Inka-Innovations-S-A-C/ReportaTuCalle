@@ -2,7 +2,7 @@ function CampoInput({ etiqueta, error, icono: Icono, className = '', ...props })
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
       {etiqueta && (
-        <label className="text-sm font-medium text-gray-700">{etiqueta}</label>
+        <label className="text-sm font-semibold text-gray-300 mb-1">{etiqueta}</label>
       )}
 
       <div className="relative">
@@ -14,8 +14,8 @@ function CampoInput({ etiqueta, error, icono: Icono, className = '', ...props })
         <input
           className={[
             'input-campo',
-            Icono ? 'pl-10' : '',
-            error ? 'border-red-500 focus:ring-red-500' : '',
+            Icono ? 'pl-11' : '',
+            error ? 'border-danger focus:ring-danger focus:border-danger' : '',
           ].join(' ')}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${props.name}-error` : undefined}
@@ -24,7 +24,7 @@ function CampoInput({ etiqueta, error, icono: Icono, className = '', ...props })
       </div>
 
       {error && (
-        <p id={`${props.name}-error`} className="text-xs text-red-600 mt-0.5" role="alert">
+        <p id={`${props.name}-error`} className="text-xs text-danger mt-1 font-medium pl-1" role="alert">
           {error}
         </p>
       )}

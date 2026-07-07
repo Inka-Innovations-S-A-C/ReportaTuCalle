@@ -40,7 +40,7 @@ export function useCrearReporte({ posicion, onExito }) {
   }
 
   async function manejarEnvio(e) {
-    e.preventDefault()
+    if (e) e.preventDefault()
     setMensajeError('')
     if (!validar()) return
 

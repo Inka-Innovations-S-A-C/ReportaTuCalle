@@ -20,9 +20,11 @@ public class Report {
     private final Long id;
     private final Long citizenId; // Referencia blanda a UserProfile
     private final Long categoryId; // Referencia blanda a Category
+    private final Long assignedToUserId; // Referencia blanda a UserProfile del supervisor asignado
     private final String title;
     private final String description;
     private final String imageUrl;
+    private final String resolutionImageUrl; // Foto del problema resuelto
     private final Point location;
     private final ReportStatus status;
     private final Integer reportCount; // Severidad: cuántas personas reportaron lo mismo
@@ -37,9 +39,11 @@ public class Report {
         this.id = builder.id;
         this.citizenId = builder.citizenId;
         this.categoryId = builder.categoryId;
+        this.assignedToUserId = builder.assignedToUserId;
         this.title = builder.title;
         this.description = builder.description;
         this.imageUrl = builder.imageUrl;
+        this.resolutionImageUrl = builder.resolutionImageUrl;
         this.location = builder.location;
         this.status = builder.status;
         this.reportCount = builder.reportCount;
@@ -63,14 +67,14 @@ public class Report {
      * Lógica de dominio: ¿Este reporte es activo?
      */
     public boolean isActive() {
-        return status == ReportStatus.PENDING || status == ReportStatus.IN_PROGRESS;
+        return status.isActive();
     }
     
     /**
      * Lógica de dominio: ¿Se puede actualizar este reporte?
      */
     public boolean canUpdate() {
-        return status != ReportStatus.RESOLVED;
+        return status.canUpdate();
     }
     
     /**
@@ -109,8 +113,10 @@ public class Report {
         
         // Campos opcionales con valores por defecto
         private Long id;
+        private Long assignedToUserId;
         private String imageUrl;
-        private ReportStatus status = ReportStatus.PENDING;
+        private String resolutionImageUrl;
+        private ReportStatus status = new PendingState();
         private Integer reportCount = 1;
         private LocalDateTime createdAt = LocalDateTime.now();
         private LocalDateTime updatedAt = LocalDateTime.now();
@@ -151,9 +157,21 @@ public class Report {
             return this;
         }
         
+        // Setter fluido para assignedToUserId (opcional)
+        public Builder assignedToUserId(Long assignedToUserId) {
+            this.assignedToUserId = assignedToUserId;
+            return this;
+        }
+        
         // Setter fluido para imageUrl (opcional)
         public Builder imageUrl(String imageUrl) {
             this.imageUrl = imageUrl;
+            return this;
+        }
+        
+        // Setter fluido para resolutionImageUrl (opcional)
+        public Builder resolutionImageUrl(String resolutionImageUrl) {
+            this.resolutionImageUrl = resolutionImageUrl;
             return this;
         }
         

@@ -7,12 +7,18 @@ import com.reportatucalle.modules.optimization.domain.models.Coordinate;
 import com.reportatucalle.modules.optimization.domain.models.OptimizedRoute;
 import com.reportatucalle.modules.report.application.dto.CreateReportRequest;
 import com.reportatucalle.modules.report.application.dto.ReportResponse;
+import com.reportatucalle.modules.report.application.dto.UpdateReportStatusRequest;
+import com.reportatucalle.modules.report.application.dto.AssignReportRequest;
 import com.reportatucalle.modules.report.application.mapper.ReportMapper;
 import com.reportatucalle.modules.report.domain.entity.Report;
 import com.reportatucalle.modules.report.domain.entity.ReportEndorsement;
 import com.reportatucalle.modules.report.domain.entity.ReportStatus;
+import com.reportatucalle.modules.report.domain.portsout.ReportNotificationPort;
 import com.reportatucalle.modules.report.domain.repository.ReportEndorsementRepository;
 import com.reportatucalle.modules.report.domain.repository.ReportRepository;
+import com.reportatucalle.modules.report.application.validation.ReportValidationChain;
+import com.reportatucalle.modules.report.application.event.ReportEventPublisher;
+import com.reportatucalle.modules.report.application.event.ReportCreatedEvent;
 import com.reportatucalle.modules.user.domain.entity.UserProfile;
 import com.reportatucalle.modules.user.domain.repository.UserProfileRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -36,6 +42,9 @@ class ReportServiceTest {
     private ReportEndorsementRepository endorsementRepository;
     private UserProfileRepository userProfileRepository;
     private RouteOptimizationService routeOptimizationService;
+    private ReportNotificationPort notificationPort;
+    private ReportValidationChain reportValidationChain;
+    private ReportEventPublisher eventPublisher;
     private ReportService service;
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
@@ -45,8 +54,11 @@ class ReportServiceTest {
         endorsementRepository = mock(ReportEndorsementRepository.class);
         userProfileRepository = mock(UserProfileRepository.class);
         routeOptimizationService = mock(RouteOptimizationService.class);
+        notificationPort = mock(ReportNotificationPort.class);
+        reportValidationChain = mock(ReportValidationChain.class);
+        eventPublisher = mock(ReportEventPublisher.class);
         service = new ReportService(reportRepository, endorsementRepository, userProfileRepository,
-                new ReportMapper(), routeOptimizationService);
+                new ReportMapper(), routeOptimizationService, notificationPort, reportValidationChain, eventPublisher);
         AuthAccountJpaEntity account = AuthAccountJpaEntity.builder().id(100L).email("ana@mail.com")
                 .password("x").role(Role.CITIZEN).build();
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(account, null));
@@ -77,6 +89,8 @@ class ReportServiceTest {
         assertEquals(1L, response.id());
         assertEquals("Bache", response.title());
         verify(endorsementRepository, never()).save(any());
+        verify(notificationPort).notifyReportCreated(any(Report.class));
+        verify(eventPublisher).publish(any(ReportCreatedEvent.class));
     }
 
     @Test
@@ -92,6 +106,7 @@ class ReportServiceTest {
         assertEquals(3, response.reportCount());
         verify(endorsementRepository).save(any(ReportEndorsement.class));
         verify(reportRepository).save(any(Report.class));
+        verify(notificationPort, never()).notifyReportCreated(any(Report.class)); // Not called for duplicate update
     }
 
     @Test
@@ -117,22 +132,71 @@ class ReportServiceTest {
     }
 
     @Test
-    void getOptimizedRouteForNearbyReports_whenNoReports_returnsEmpty() {
-        when(reportRepository.findReportsWithinRadius(any(), eq(100.0))).thenReturn(List.of());
+    void getOptimizedRouteForSelectedReports_WithoutReports_ShouldReturnEmpty() {
+        when(reportRepository.findAllById(anyList())).thenReturn(List.of());
 
-        assertTrue(service.getOptimizedRouteForNearbyReports(2L, -12.0, -77.0, 100.0).isEmpty());
+        assertTrue(service.getOptimizedRouteForSelectedReports(1L, -12.0464, -77.0428, List.of()).isEmpty());
     }
 
     @Test
-    void getOptimizedRouteForNearbyReports_delegatesToOptimizationService() {
-        Report r = report(1L, 50L, 1);
-        OptimizedRoute optimized = new OptimizedRoute(List.of(new Coordinate(1L, -12.0, -77.0)), 0.5);
-        when(reportRepository.findReportsWithinRadius(any(), eq(100.0))).thenReturn(List.of(r));
-        when(routeOptimizationService.optimizeRoute(eq(2L), any(Coordinate.class), anyList())).thenReturn(Optional.of(optimized));
+    void getOptimizedRouteForSelectedReports_WithNearbyReports_ShouldReturnRoute() {
+        Report mockReport = report(1L, 50L, 1);
+        OptimizedRoute mockOptimizedRoute = new OptimizedRoute(List.of(new Coordinate(1L, -12.0, -77.0, 1)), 0.5, java.util.Map.of());
+        when(reportRepository.findAllById(anyList())).thenReturn(List.of(mockReport));
+        when(routeOptimizationService.optimizeRoute(anyLong(), any(), anyList())).thenReturn(Optional.of(mockOptimizedRoute));
 
-        Optional<OptimizedRoute> result = service.getOptimizedRouteForNearbyReports(2L, -12.0, -77.0, 100.0);
+        Optional<OptimizedRoute> route = service.getOptimizedRouteForSelectedReports(2L, -12.0464, -77.0428, List.of(1L));
 
-        assertEquals(Optional.of(optimized), result);
+        assertEquals(Optional.of(mockOptimizedRoute), route);
+    }
+
+    @Test
+    void getAllReports_returnsAllReports() {
+        when(reportRepository.findAll()).thenReturn(List.of(report(1L, 10L, 1), report(2L, 20L, 2)));
+        List<ReportResponse> result = service.getAllReports();
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void getReportById_whenExists_returnsReport() {
+        when(reportRepository.findById(1L)).thenReturn(Optional.of(report(1L, 10L, 1)));
+        ReportResponse response = service.getReportById(1L);
+        assertEquals(1L, response.id());
+    }
+
+    @Test
+    void getAssignedReports_returnsSupervisorReports() {
+        when(reportRepository.findByAssignedToUserIdAndStatusIn(eq(50L), anyList())).thenReturn(new java.util.ArrayList<>(List.of(report(1L, 10L, 1))));
+        when(reportRepository.findTop30ByAssignedToUserIdAndStatusOrderByCreatedAtDesc(eq(50L), any(com.reportatucalle.modules.report.domain.entity.ReportStatus.class))).thenReturn(new java.util.ArrayList<>());
+        List<ReportResponse> result = service.getAssignedReports();
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void updateReportStatus_updatesAndReturnsReport() {
+        Report r = report(1L, 10L, 1);
+        when(reportRepository.findById(1L)).thenReturn(Optional.of(r));
+        when(reportRepository.save(any(Report.class))).thenAnswer(i -> i.getArgument(0));
+
+        UpdateReportStatusRequest request = new UpdateReportStatusRequest("IN_PROGRESS", null);
+        ReportResponse response = service.updateReportStatus(1L, request);
+
+        assertEquals("IN_PROGRESS", response.status());
+        verify(notificationPort).notifyReportStatusUpdated(any(Report.class));
+    }
+
+    @Test
+    void assignReport_updatesAssigneeAndStatus() {
+        Report r = report(1L, 10L, 1);
+        when(reportRepository.findById(1L)).thenReturn(Optional.of(r));
+        when(reportRepository.save(any(Report.class))).thenAnswer(i -> i.getArgument(0));
+
+        AssignReportRequest req = new AssignReportRequest(50L);
+        ReportResponse response = service.assignReport(1L, req);
+
+        assertEquals("ASSIGNED", response.status());
+        assertEquals(50L, response.assignedToUserId());
+        verify(notificationPort).notifyReportAssigned(any(Report.class));
     }
 
     private CreateReportRequest request() {
@@ -143,6 +207,6 @@ class ReportServiceTest {
         return Report.builder().id(id).citizenId(citizenId).categoryId(2L)
                 .title("Bache").description("Hay un hueco").imageUrl("foto.jpg")
                 .location(geometryFactory.createPoint(new org.locationtech.jts.geom.Coordinate(-77.0, -12.0)))
-                .status(ReportStatus.PENDING).reportCount(count).build();
+                .status(com.reportatucalle.modules.report.domain.entity.ReportStatusFactory.fromString("PENDING")).reportCount(count).build();
     }
 }

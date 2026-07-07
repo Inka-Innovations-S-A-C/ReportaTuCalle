@@ -1,4 +1,4 @@
-INSERT INTO public.categories (name, description, marker_color, algorithm_type, is_active, created_at, updated_at)
+INSERT INTO category.categories (name, description, marker_color, algorithm_type, is_active, created_at, updated_at)
 VALUES
   ('Bache / Pavimento dañado',   'Huecos o grietas en el asfalto que representan peligro.',           '#EF4444', 'ROUTING',      TRUE, NOW(), NOW()),
   ('Basura acumulada',           'Acumulación de residuos en vía pública o espacios comunes.',        '#F97316', 'ROUTING',      TRUE, NOW(), NOW()),

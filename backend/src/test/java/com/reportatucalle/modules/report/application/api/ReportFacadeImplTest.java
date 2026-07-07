@@ -2,6 +2,7 @@ package com.reportatucalle.modules.report.application.api;
 
 import com.reportatucalle.modules.report.domain.entity.Report;
 import com.reportatucalle.modules.report.domain.entity.ReportStatus;
+import com.reportatucalle.modules.report.domain.entity.ReportStatusFactory;
 import com.reportatucalle.modules.report.domain.repository.ReportRepository;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -47,6 +48,6 @@ class ReportFacadeImplTest {
         return Report.builder().id(id).citizenId(citizenId).categoryId(categoryId)
                 .title("T").description("D")
                 .location(geometryFactory.createPoint(new Coordinate(-77, -12)))
-                .status(ReportStatus.PENDING).build();
+                .status(ReportStatusFactory.fromString("PENDING")).build();
     }
 }

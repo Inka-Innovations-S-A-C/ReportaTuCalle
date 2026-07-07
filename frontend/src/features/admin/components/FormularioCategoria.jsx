@@ -6,9 +6,9 @@ import { useCrearCategoria } from '../hooks/useCrearCategoria'
 
 const ALGORITMOS = [
   { value: 'NONE', label: 'Ninguno (solo visualización)' },
-  { value: 'ROUTING', label: 'Routing — TSP/VRP (ej. baches, basura)' },
-  { value: 'FLOW', label: 'Flow — flujo máximo (ej. fugas de agua)' },
-  { value: 'CONNECTIVITY', label: 'Connectivity — árbol mínimo (ej. semáforos)' },
+  { value: 'ROUTING', label: 'Rutas de Vehículos (Routing - ej. baches)' },
+  { value: 'FLOW', label: 'Flujo y Presión (Flow Network - ej. fugas de agua)' },
+  { value: 'CONNECTIVITY', label: 'Infraestructura y Redes (Connectivity - ej. semáforos)' },
 ]
 
 const COLORES_RAPIDOS = [
@@ -16,7 +16,7 @@ const COLORES_RAPIDOS = [
   '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280',
 ]
 
-function FormularioCategoria({ onExito, onCancelar }) {
+function FormularioCategoria({ onExito, onCancelar, initialData }) {
   const {
     formulario,
     errores,
@@ -26,7 +26,7 @@ function FormularioCategoria({ onExito, onCancelar }) {
     setCampo,
     manejarEnvio,
     limpiarError,
-  } = useCrearCategoria({ onExito })
+  } = useCrearCategoria({ onExito, initialData })
 
   return (
     <form onSubmit={manejarEnvio} className="space-y-4" noValidate>
@@ -107,7 +107,7 @@ function FormularioCategoria({ onExito, onCancelar }) {
           </Boton>
         )}
         <Boton type="submit" variante="primario" cargando={cargando} className="flex-1">
-          {cargando ? 'Creando...' : 'Crear categoría'}
+          {cargando ? 'Guardando...' : initialData ? 'Actualizar' : 'Crear categoría'}
         </Boton>
       </div>
     </form>

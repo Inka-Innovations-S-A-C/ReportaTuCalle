@@ -4,6 +4,7 @@ import com.reportatucalle.modules.auth.domain.entity.Role;
 import com.reportatucalle.modules.auth.infrastructure.persistence.entity.AuthAccountJpaEntity;
 import com.reportatucalle.modules.user.application.dto.UpdateProfileRequest;
 import com.reportatucalle.modules.user.application.dto.UserProfileResponse;
+import com.reportatucalle.modules.user.application.dto.UserProfileSummaryResponse;
 import com.reportatucalle.modules.user.domain.entity.UserProfile;
 import com.reportatucalle.modules.user.domain.repository.UserProfileRepository;
 import com.reportatucalle.shared.exception.BusinessException;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,5 +78,19 @@ class UserServiceTest {
         BusinessException ex = assertThrows(BusinessException.class, () -> service.getMyProfile());
 
         assertEquals("PROFILE_NOT_FOUND", ex.getErrorCode());
+    }
+
+    @Test
+    void getAllUsers_returnsSummaryResponses() {
+        UserProfile p1 = UserProfile.builder().id(1L).accountId(10L).firstName("A").lastName("B").phone("123").build();
+        UserProfile p2 = UserProfile.builder().id(2L).accountId(20L).firstName("C").lastName("D").phone("456").build();
+        when(repository.findAll()).thenReturn(List.of(p1, p2));
+
+        List<UserProfileSummaryResponse> result = service.getAllUsers();
+
+        assertEquals(2, result.size());
+        assertEquals("A B", result.get(0).fullName());
+        assertEquals("C D", result.get(1).fullName());
+        assertEquals(10L, result.get(0).accountId());
     }
 }

@@ -24,7 +24,7 @@ public class ConnectivityOptimizationAdapter implements ConnectivityOptimization
     @Override
     public OptimizedRoute calculateMinimumSpanningTree(List<Coordinate> nodes) {
         if (nodes.isEmpty()) {
-            return new OptimizedRoute(List.of(), 0.0);
+            return new OptimizedRoute(List.of(), 0.0, java.util.Map.of());
         }
 
         int n = nodes.size();
@@ -63,37 +63,45 @@ public class ConnectivityOptimizationAdapter implements ConnectivityOptimization
         }
 
         // Reconstruir el recorrido del MST en orden
-        List<Coordinate> orderedStops = buildOrderedPath(nodes, parent, n);
+        List<Coordinate> path = buildOrderedPath(nodes, parent, n);
+        totalDistance = calculateTotalDistance(path);
 
-        return new OptimizedRoute(orderedStops, totalDistance);
+        return new OptimizedRoute(path, totalDistance, java.util.Map.of());
     }
 
     /**
      * Construye el recorrido del MST como lista ordenada de coordenadas.
-     * Hace un recorrido DFS sobre el árbol generado por Prim.
+     * Hace un recorrido DFS SOBRE EL ÁRBOL incluyendo el retroceso (backtracking),
+     * para que si se dibuja o enruta secuencialmente, trace exactamente las
+     * aristas del árbol sin saltos.
      */
     private List<Coordinate> buildOrderedPath(List<Coordinate> nodes, int[] parent, int n) {
-        // Construir lista de hijos por nodo
         Map<Integer, List<Integer>> children = new HashMap<>();
         for (int i = 0; i < n; i++) children.put(i, new ArrayList<>());
         for (int i = 1; i < n; i++) {
             if (parent[i] != -1) children.get(parent[i]).add(i);
         }
 
-        // DFS desde la raíz (nodo 0)
         List<Coordinate> path = new ArrayList<>();
-        Deque<Integer> stack = new ArrayDeque<>();
-        stack.push(0);
-
-        while (!stack.isEmpty()) {
-            int node = stack.pop();
-            path.add(nodes.get(node));
-            for (int child : children.get(node)) {
-                stack.push(child);
-            }
-        }
-
+        dfsWalk(0, children, nodes, path);
         return path;
+    }
+
+    private void dfsWalk(int current, Map<Integer, List<Integer>> children, List<Coordinate> nodes, List<Coordinate> path) {
+        path.add(nodes.get(current));
+        for (int child : children.get(current)) {
+            dfsWalk(child, children, nodes, path);
+            // Retroceso (backtracking) para mantener la continuidad del trazo
+            path.add(nodes.get(current));
+        }
+    }
+
+    private double calculateTotalDistance(List<Coordinate> path) {
+        double total = 0.0;
+        for (int i = 0; i < path.size() - 1; i++) {
+            total += calculateDistance(path.get(i), path.get(i + 1));
+        }
+        return total;
     }
 
     private double calculateDistance(Coordinate from, Coordinate to) {

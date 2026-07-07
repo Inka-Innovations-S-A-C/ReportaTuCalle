@@ -2,16 +2,16 @@ import { AlertCircle, CheckCircle, X } from 'lucide-react'
 
 const CONFIG_TIPO = {
   error: {
-    contenedor: 'bg-red-50 border border-red-200 text-red-700',
+    contenedor: 'bg-danger/10 border border-danger/30 text-danger shadow-[0_0_15px_rgba(239,68,68,0.15)]',
     Icono: AlertCircle,
   },
   exito: {
-    contenedor: 'bg-green-50 border border-green-200 text-green-700',
+    contenedor: 'bg-accent-500/10 border border-accent-500/30 text-accent-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]',
     Icono: CheckCircle,
   },
 }
 
-function AlertaMensaje({ mensaje, tipo = 'error', onCerrar }) {
+function AlertaMensaje({ mensaje, tipo = 'error', onCerrar, flotante = false }) {
   if (!mensaje) return null
 
   const { contenedor, Icono } = CONFIG_TIPO[tipo] ?? CONFIG_TIPO.error
@@ -19,7 +19,9 @@ function AlertaMensaje({ mensaje, tipo = 'error', onCerrar }) {
   return (
     <div
       role="alert"
-      className={`flex items-start gap-3 rounded-lg px-4 py-3 text-sm ${contenedor}`}
+      className={`flex items-start gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-300 ${contenedor} ${
+        flotante ? 'fixed bottom-6 right-6 z-[9999] shadow-2xl animate-fade-in translate-y-0 min-w-[300px]' : ''
+      }`}
     >
       <Icono size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
       <p className="flex-1 leading-snug">{mensaje}</p>

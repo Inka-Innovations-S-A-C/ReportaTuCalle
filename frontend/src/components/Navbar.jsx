@@ -19,10 +19,26 @@ function Navbar() {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo y nombre */}
-          <Link to="/dashboard" className="flex items-center gap-2 font-bold text-lg hover:opacity-90 transition-opacity">
-            <MapPin className="text-verde-400" size={24} />
-            <span className="hidden sm:block">ReportaTuCalle</span>
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link to="/dashboard" className="flex items-center gap-2 font-bold text-lg hover:opacity-90 transition-opacity">
+              <MapPin className="text-verde-400" size={24} />
+              <span className="hidden sm:block">ReportaTuCalle</span>
+            </Link>
+
+            {/* Enlaces de navegación por rol */}
+            <div className="hidden md:flex items-center gap-2 mt-1">
+              {(usuario?.role === 'SUPERVISOR' || usuario?.role === 'ADMIN') && (
+                <Link to="/supervisor" className="text-sm font-medium text-gray-300 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                  Panel Supervisor
+                </Link>
+              )}
+              {usuario?.role === 'ADMIN' && (
+                <Link to="/admin" className="text-sm font-medium text-gray-300 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                  Panel Admin
+                </Link>
+              )}
+            </div>
+          </div>
 
           {/* Acciones escritorio */}
           <div className="hidden md:flex items-center gap-4">
@@ -65,6 +81,17 @@ function Navbar() {
             <User size={16} />
             <span>{usuario?.username || usuario?.nombre || 'Ciudadano'}</span>
           </div>
+
+          {(usuario?.role === 'SUPERVISOR' || usuario?.role === 'ADMIN') && (
+            <Link to="/supervisor" onClick={() => setMenuAbierto(false)} className="block w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+              Panel Supervisor
+            </Link>
+          )}
+          {usuario?.role === 'ADMIN' && (
+            <Link to="/admin" onClick={() => setMenuAbierto(false)} className="block w-full text-left px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+              Panel Admin
+            </Link>
+          )}
 
           <button
             onClick={manejarCerrarSesion}

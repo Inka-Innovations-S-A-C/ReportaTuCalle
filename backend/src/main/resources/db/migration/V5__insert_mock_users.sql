@@ -1,8 +1,8 @@
 -- Contraseña para todos es: Password123!
 -- Generado con BCrypt (costo 10)
 
--- Insertar cuentas en auth.auth_accounts
-INSERT INTO auth.auth_accounts (id, email, password, role, created_at) VALUES 
+-- Insertar cuentas en rtc_auth.auth_accounts
+INSERT INTO rtc_auth.auth_accounts (id, email, password, role, created_at) VALUES 
 (1001, 'admin@test.com', '$2b$12$rzRTZUoA3DDQGUenjXhl1.o64ZK2xWkjqhZgSLbSVYG4wTx9f2YrO', 'ADMIN', CURRENT_TIMESTAMP),
 (1002, 'supervisor@test.com', '$2b$12$rzRTZUoA3DDQGUenjXhl1.o64ZK2xWkjqhZgSLbSVYG4wTx9f2YrO', 'SUPERVISOR', CURRENT_TIMESTAMP),
 (1003, 'ciudadano@test.com', '$2b$12$rzRTZUoA3DDQGUenjXhl1.o64ZK2xWkjqhZgSLbSVYG4wTx9f2YrO', 'CITIZEN', CURRENT_TIMESTAMP),

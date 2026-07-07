@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { crearCategoria } from '../services/adminCategoryService'
+import { actualizarCategoria } from '../../categories/services/categoryService'
 
 const ESTADO_INICIAL = {
   name: '',
@@ -8,8 +9,8 @@ const ESTADO_INICIAL = {
   algorithmType: 'NONE',
 }
 
-export function useCrearCategoria({ onExito } = {}) {
-  const [formulario, setFormulario] = useState(ESTADO_INICIAL)
+export function useCrearCategoria({ onExito, initialData } = {}) {
+  const [formulario, setFormulario] = useState(initialData || ESTADO_INICIAL)
   const [errores, setErrores] = useState({})
   const [mensajeError, setMensajeError] = useState('')
   const [cargando, setCargando] = useState(false)
@@ -42,14 +43,18 @@ export function useCrearCategoria({ onExito } = {}) {
     if (!validar()) return
     setCargando(true)
     try {
-      const nueva = await crearCategoria({
+      const datosCat = {
         name: formulario.name.trim(),
         description: formulario.description.trim(),
         markerColor: formulario.markerColor,
         algorithmType: formulario.algorithmType,
-      })
+      }
+      const nueva = initialData 
+        ? await actualizarCategoria(initialData.id, datosCat)
+        : await crearCategoria(datosCat)
+      
       setFormulario(ESTADO_INICIAL)
-      onExito?.(nueva)
+      onExito?.(nueva, !!initialData)
     } catch (err) {
       const status = err.response?.status
       if (status === 409) setMensajeError('Ya existe una categoría con ese nombre.')

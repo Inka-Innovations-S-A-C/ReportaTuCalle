@@ -42,10 +42,11 @@ export function AuthProvider({ children }) {
     if (token && usuarioRaw && tokenEsValido(token)) {
       try {
         const parsed = JSON.parse(usuarioRaw)
-        // Asegura que el role siempre venga del JWT (fuente de verdad)
-        if (!parsed.role) {
-          const payload = parsearPayloadJwt(token)
-          parsed.role = payload?.role ?? 'CITIZEN'
+        // Asegurar que datos clave vengan del JWT (fuente de verdad)
+        const payload = parsearPayloadJwt(token)
+        if (payload) {
+          parsed.role = payload.role ?? 'CITIZEN'
+          parsed.profileId = payload.profileId
         }
         setUsuario(parsed)
       } catch {
@@ -77,7 +78,11 @@ export function AuthProvider({ children }) {
 
   const iniciarSesion = useCallback((token, datosUsuario) => {
     const payload = parsearPayloadJwt(token)
-    const usuarioCompleto = { ...datosUsuario, role: payload?.role ?? 'CITIZEN' }
+    const usuarioCompleto = { 
+      ...datosUsuario, 
+      role: payload?.role ?? 'CITIZEN',
+      profileId: payload?.profileId
+    }
     localStorage.setItem('rtk_token', token)
     localStorage.setItem('rtk_usuario', JSON.stringify(usuarioCompleto))
     setUsuario(usuarioCompleto)

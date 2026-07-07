@@ -9,8 +9,8 @@ import AlertaMensaje from '../../../shared/ui/AlertaMensaje'
 function LoginForm({ formulario, errores, mensajeError, cargando, onCambio, onEnvio, onCerrarError }) {
   return (
     <>
-      <h2 className="text-xl font-semibold text-gray-800 mb-1">Iniciar sesión</h2>
-      <p className="text-sm text-gray-500 mb-6">Ingresa tus credenciales para continuar</p>
+      <h2 className="text-2xl font-bold text-gray-100 mb-1 tracking-tight">Iniciar sesión</h2>
+      <p className="text-sm text-gray-400 mb-8 font-light">Ingresa tus credenciales para continuar</p>
 
       {mensajeError && (
         <div className="mb-4">
@@ -55,9 +55,9 @@ function LoginForm({ formulario, errores, mensajeError, cargando, onCambio, onEn
         </Boton>
       </form>
 
-      <p className="text-center text-sm text-gray-500 mt-6">
+      <p className="text-center text-sm text-gray-400 mt-6">
         ¿No tienes cuenta?{' '}
-        <Link to="/registro" className="text-verde-600 font-semibold hover:underline focus:outline-none focus:underline">
+        <Link to="/registro" className="text-primary-400 font-semibold hover:text-primary-300 hover:underline focus:outline-none focus:underline transition-colors">
           Regístrate aquí
         </Link>
       </p>

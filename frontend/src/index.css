@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,47 +7,98 @@
 
 @layer base {
   * { box-sizing: border-box; }
-  body { @apply bg-gray-50 text-gray-900 font-sans; }
+  body { 
+    @apply bg-background text-gray-100 font-sans antialiased selection:bg-primary-500 selection:text-white;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
 }
 
 @layer components {
+  /* Glassmorphism primitives */
+  .glass-panel {
+    @apply bg-surface/80 backdrop-blur-xl border border-white/5 shadow-glass;
+  }
+  
+  .glass-card {
+    @apply bg-surfaceHighlight/50 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg hover:border-primary-500/30 transition-all duration-300;
+  }
+
+  /* Premium Buttons */
   .btn-primario {
-    @apply w-full flex justify-center items-center gap-2 py-3 px-4 rounded-lg
-           bg-verde-600 text-white font-semibold text-sm
-           hover:bg-verde-700 active:bg-verde-800
-           focus:outline-none focus:ring-2 focus:ring-verde-500 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200;
+    @apply relative w-full flex justify-center items-center gap-2 py-3 px-5 rounded-xl
+           bg-gradient-to-r from-primary-600 to-primary-500 text-white font-semibold text-sm
+           shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40
+           hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]
+           focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-background
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
+           transition-all duration-300 ease-out overflow-hidden;
+  }
+  
+  .btn-primario::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full;
+  }
+  .btn-primario:hover::after {
+    @apply animate-[shimmer_1.5s_infinite];
   }
 
   .btn-secundario {
-    @apply w-full flex justify-center items-center gap-2 py-3 px-4 rounded-lg
-           bg-white text-azul-800 font-semibold text-sm border border-azul-800
-           hover:bg-azul-50 active:bg-azul-100
-           focus:outline-none focus:ring-2 focus:ring-azul-500 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200;
+    @apply w-full flex justify-center items-center gap-2 py-3 px-5 rounded-xl
+           bg-surfaceHighlight text-gray-200 font-semibold text-sm border border-white/10
+           hover:bg-white/10 hover:border-white/20 active:bg-white/5
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-background
+           disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300;
   }
 
+  /* Premium Inputs */
   .input-campo {
-    @apply w-full px-4 py-3 rounded-lg border border-gray-300 bg-white
-           text-gray-900 text-sm placeholder-gray-400
-           focus:outline-none focus:ring-2 focus:ring-verde-500 focus:border-transparent
-           disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors duration-200;
+    @apply w-full px-4 py-3.5 rounded-xl border border-white/10 bg-surface/50
+           text-gray-100 text-sm placeholder-gray-500 backdrop-blur-sm
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500/50 focus:bg-surface
+           hover:border-white/20
+           disabled:bg-surfaceHighlight disabled:cursor-not-allowed transition-all duration-300 shadow-inner;
   }
 
   .tarjeta {
-    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
+    @apply glass-card p-6;
   }
 }
 
-/* Leaflet popup — ajuste de tipografía para que coincida con el diseño */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* Leaflet popup styling override for dark theme */
+.leaflet-container {
+  font-family: 'Outfit', sans-serif !important;
+  background-color: #0B0F19 !important;
+}
 .leaflet-popup-content-wrapper {
-  border-radius: 12px !important;
+  background: rgba(21, 28, 44, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  color: #f3f4f6 !important;
   padding: 0 !important;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+}
+.leaflet-popup-tip {
+  background: rgba(21, 28, 44, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 .leaflet-popup-content {
-  margin: 12px 14px !important;
-  min-width: 180px;
+  margin: 16px !important;
+  min-width: 220px;
 }
-.leaflet-popup-tip-container { margin-top: -1px; }
+.leaflet-popup-close-button {
+  color: #9ca3af !important;
+  padding: 8px !important;
+}
+.leaflet-popup-close-button:hover {
+  color: #f3f4f6 !important;
+}

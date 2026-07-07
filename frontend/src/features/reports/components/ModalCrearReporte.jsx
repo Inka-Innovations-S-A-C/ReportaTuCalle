@@ -2,8 +2,8 @@ import Modal from '../../../shared/ui/Modal'
 import FormularioReporte from './FormularioReporte'
 
 function ModalCrearReporte({ abierto, onCerrar, posicion, onExito }) {
-  const manejarExito = () => {
-    onExito?.()
+  const manejarExito = (response) => {
+    onExito?.(response)
     onCerrar()
   }
 

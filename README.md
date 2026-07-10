@@ -2,14 +2,14 @@
 
 Plataforma de gestión cívica para reportes de incidentes viales. Construido con arquitectura de grado empresarial para asegurar mantenibilidad y escalabilidad.
 
-## 🏗️ Arquitectura y Tecnologías
+## Arquitectura y Tecnologías
 - **Backend:** Java 21, Spring Boot 3, Arquitectura Hexagonal (Puertos y Adaptadores), PostgreSQL + PostGIS (Datos Geoespaciales).
 - **Frontend:** React 18, Vite, Tailwind CSS, Leaflet (Mapas Interactivos), SSE (Server-Sent Events) para tiempo real.
 - **QA:** JUnit 5 + Mockito (Pruebas Unitarias Backend), Cypress (Pruebas E2E Frontend).
 
 ---
 
-## 🚀 Flujo de Trabajo de Desarrollo (Cómo ejecutar el proyecto)
+## Flujo de Trabajo de Desarrollo (Cómo ejecutar el proyecto)
 
 ### 1. Iniciar Base de Datos (Docker)
 Requisito previo: Tener Docker y Docker Compose instalados.
@@ -38,7 +38,7 @@ La aplicación web estará disponible en `http://localhost:5173`.
 
 ---
 
-## 🧪 Ejecución de Pruebas (QA)
+## Ejecución de Pruebas (QA)
 
 ### Pruebas Unitarias (Backend)
 Verifican la lógica de negocio aislada usando Mockito.
@@ -67,7 +67,7 @@ npm run cypress:run
 
 ---
 
-## 📚 Estructura del Repositorio
-- `/backend/src/main/java/com/reportatucalle/modules/` → Lógica separada por módulos (Auth, Report, User, Optimization) respetando Arquitectura Hexagonal.
-- `/frontend/src/` → Componentes React modulares.
-- `/frontend/cypress/e2e/` → Archivos de prueba End-to-End.
+## Estructura del Repositorio
+- `/backend/src/main/java/com/reportatucalle/modules/` -> Lógica separada por módulos (Auth, Report, User, Optimization) respetando Arquitectura Hexagonal.
+- `/frontend/src/` -> Componentes React modulares.
+- `/frontend/cypress/e2e/` -> Archivos de prueba End-to-End.

@@ -1,51 +1,51 @@
-# 🚀 ReportaTuCalle - Development Workflow
+# ReportaTuCalle - Development Workflow
 
-Este es el flujo de trabajo paso a paso para levantar todo el ecosistema de ReportaTuCalle en tu entorno local.
+Este es el flujo de trabajo paso a paso para levantar todo el ecosistema de ReportaTuCalle en su entorno local.
 
 ---
 
 ### 1. Iniciar la Base de Datos (Docker)
-Primero, necesitamos levantar PostgreSQL + PostGIS usando Docker.
+Primero, es necesario levantar PostgreSQL + PostGIS usando Docker.
 ```bash
-# Navega a la carpeta principal
+# Navegar a la carpeta principal
 cd /home/yuse/Desktop/ReportaTuCalle/backend
 
-# Inicia la base de datos en segundo plano
+# Iniciar la base de datos en segundo plano
 docker compose up -d
 
-# Para apagarla cuando termines: docker compose down
+# Para detener los contenedores cuando se termine: docker compose down
 ```
 
 ### 2. Iniciar el Backend (Spring Boot)
-Una vez que la base de datos está corriendo, iniciamos el servidor Java. Él aplicará automáticamente las migraciones (Flyway) y creará los usuarios mock (`admin@test.com` y `supervisor@test.com`).
+Una vez que la base de datos está ejecutándose, se inicia el servidor Java. Este aplicará automáticamente las migraciones (Flyway) y creará los usuarios predeterminados (`admin@test.com` y `supervisor@test.com`).
 ```bash
-# Asegúrate de estar en la carpeta backend
+# Asegurarse de estar en la carpeta backend
 cd /home/yuse/Desktop/ReportaTuCalle/backend
 
-# Inicia el backend (correrá en http://localhost:8080)
+# Iniciar el backend (se ejecutará en http://localhost:8080)
 mvn spring-boot:run
 ```
 
 ### 3. Iniciar el Frontend (React + Vite)
-Con el backend listo, levantamos la interfaz visual en una **nueva terminal**.
+Con el backend listo, se levanta la interfaz visual en una **nueva terminal**.
 ```bash
-# Abre una nueva terminal y navega al frontend
+# Abrir una nueva terminal y navegar al frontend
 cd /home/yuse/Desktop/ReportaTuCalle/frontend
 
-# Inicia el servidor de desarrollo (correrá en http://localhost:5173)
+# Iniciar el servidor de desarrollo (se ejecutará en http://localhost:5173)
 npm run dev
 ```
 
-### 4. Simular Tráfico y Ataques (Locust Bot)
-Si quieres ver cómo el servidor resiste múltiples ciudadanos enviando reportes a la vez, abre una **tercera terminal** y lanza los bots.
+### 4. Simular Tráfico y Carga (Locust)
+Para evaluar la resistencia del servidor ante múltiples solicitudes concurrentes, se puede iniciar una **tercera terminal** y lanzar el script de pruebas de carga.
 ```bash
-# Navega a la carpeta principal
+# Navegar a la carpeta principal
 cd /home/yuse/Desktop/ReportaTuCalle
 
-# Activa el entorno virtual de Python
+# Activar el entorno virtual de Python
 source venv/bin/activate
 
-# Lanza la GUI de Locust (correrá en http://localhost:8089)
+# Lanzar la GUI de Locust (se ejecutará en http://localhost:8089)
 locust -f locustfile.py
 ```
-*Abre tu navegador en `http://localhost:8089`, pon 100 usuarios, ¡y mira cómo explota de actividad la terminal de Spring Boot y cómo aparecen marcadores en el mapa del Frontend!*
+*Abrir el navegador en `http://localhost:8089`, configurar el número de usuarios concurrentes y observar el tráfico en el servidor Spring Boot y el panel del Frontend.*
